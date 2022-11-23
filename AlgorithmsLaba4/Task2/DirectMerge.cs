@@ -15,14 +15,11 @@ namespace AlgorithmsLaba4.Task2
         private long positionA = 0;
         private long positionB = 0;
         private long positionC = 0;
-        private bool popB = false;
-        private bool popC = false;
         private int countA = 0;
+        private int countB = 0;
+        private int countC = 0;
         private List<int> countOp;
         private Logger logger;
-
-        private int countRound = 0;
-
         public DirectMerge()
         {
             logger = new Logger("Прямая сортировка");
@@ -55,28 +52,31 @@ namespace AlgorithmsLaba4.Task2
             countOp = new List<int>();
             countOp.Add(2);
             int sizeTempData = 2;
-            int dataWrite;
-            NaturalMerge naturalMerge = new NaturalMerge();
-            bool exit = naturalMerge.Distribution();
-            if (exit)
-            {
-                countOp.Clear();
-            }
+            //NaturalMerge naturalMerge = new NaturalMerge();
+            //bool exit = naturalMerge.Distribution();
+            //if (exit)
+            //{
+            //    countOp.Clear();
+            //}
+            bool readB = false;
+            bool readC = false;
             ClearFile("B");
             ClearFile("C");
+            int tempDataWrite = 0;
             for (int i = 0; i < countOp.Count; i++)
             {
+                //если последовательность остортированна то выходим (добавить метод)
                 do
                 {
                     for (int j = 0; j < sizeTempData / 2; j++)
                     {
+                        tempDataWrite = Read("A", positionA);
+                        Write(tempDataWrite, "B", true);
+                        countB++;
                         if (positionA == maxPositionA)
                         {
                             break;
                         }
-                        dataWrite = Read("A", positionA);
-                        Write(dataWrite, "B", true);
-                        countA++;
                     }
                     if (maxPositionA == positionA)
                     {
@@ -84,82 +84,75 @@ namespace AlgorithmsLaba4.Task2
                     }
                     for (int j = 0; j < sizeTempData / 2; j++)
                     {
+                        tempDataWrite = Read("A", positionA);
+                        Write(tempDataWrite, "C", true);
+                        countC++;
                         if (positionA == maxPositionA)
                         {
                             break;
                         }
-                        dataWrite = Read("A", positionA);
-                        Write(dataWrite, "C", true);
-                        countA++;
                     }
-
                 } while (maxPositionA != positionA);
-                if (temp)
+                countA = countB + countC;
+                if (temp) // убрать куда-то в начало и переработать
                 {
                     CountOpSet();
                     temp = false;
                 }
                 ClearFile("A");
-                int firstRead = Read("B", positionB);
-                popB = true;
-                int secondRead = 0;
-                // && maxPositionA > 10900
-                if (countRound == 9)
+                if (i == 4)
                 {
                     Console.WriteLine();
                 }
-                countRound++;
-                while ((maxPositionB != positionB) || (maxPositionC != positionC))
+                //int firstRead = Read("B", positionB);
+                List<int> listB = new List<int>();
+                List<int> listC = new List<int>();
+                listB.Add(Read("B", positionB));
+                listC.Add(Read("C", positionC));
+                //int secondRead = Read("C", positionC);
+                while ((maxPositionB != positionB) || (countB != 0))
                 {
-                    if (popB == false)
+                    if (maxPositionC != positionC || countC != 0)// если в C закончились элементы, то дозаписываем все элементы из B
                     {
-                        if (maxPositionB != positionB)
-                        {
-                            firstRead = Read("B", positionB);
-                            popB = true;
-                        }
-                    }
-                    if (maxPositionC != positionC)
-                    {
-                        int countAllOp = countOp[i];
-                        int countOpB = sizeTempData / 2;
-                        int countOpC = sizeTempData / 2;
+                        int countAllOp = countOp[i];// количесво операций считования
+                        int countOpB = sizeTempData / 2;// количесво операций считования с B
+                        int countOpC = sizeTempData / 2;// количесво операций считования с С
                         if (i == countOp.Count - 1 && countA > 2)
                         {
                             countOpC = countOp[i] - countOp[i - 1];
+                            // если финальные сравнения,
+                            // то кол-во операций C будет равно
+                            // кол-во всех предпоследних оперций - кол-во всех финальных операций
                         }
-                        for (; countAllOp > 0;)
+                        while (countAllOp > 0 && countC != 0)
                         {
-                            if (popC == false)
+                            if (listB[0].CompareTo(listC[0]).Equals(-1))
                             {
-                                if (positionC != maxPositionC)
+                                if (listB.Count != 0)
                                 {
-                                    secondRead = Read("C", positionC);
-                                    popC = true;
+                                    Write(listB[0], "A", true);
+                                    listB.Clear();
                                 }
-                            }
-                            if (firstRead.CompareTo(secondRead).Equals(-1))
-                            {
-                                Write(firstRead, "A", true);
-                                popB = false;
+                                countB--;
                                 countOpB--;
-                                if (popB == false && countOpB != 0)
+                                if (maxPositionB != positionB)
                                 {
-                                    if (maxPositionB != positionB)
-                                    {
-                                        firstRead = Read("B", positionB);
-                                        popB = true;
-                                    }
+                                    listB.Add(Read("B", positionB));
                                 }
                             }
                             else
                             {
-                                if (popC == true)
+                                if (listC.Count != 0)
                                 {
-                                    Write(secondRead, "A", true);
-                                    popC = false;
+                                    Write(listC[0], "A", true);
+                                    listC.Clear();
                                 }
+                                countC--;
                                 countOpC--;
+                                if (positionC != maxPositionC)
+                                {
+                                    listC.Add(Read("C", positionC));
+                                }
                             }
                             countAllOp--;
                             if (countOpB == 0 || countOpC == 0)
@@ -167,46 +160,51 @@ namespace AlgorithmsLaba4.Task2
                                 break;
                             }
                         }
-                        for (; countAllOp > 0;)
+                        while (countAllOp > 0)
                         {
                             if (countOpB > 0)
                             {
-                                Write(firstRead, "A", true);
-                                popB = false;
+                                if (listB.Count != 0)
+                                {
+                                    Write(listB[0], "A", true);
+                                    listB.Clear();
+                                }
+                                countB--;
                                 countOpB--;
+                                if (maxPositionB != positionB)
+                                {
+                                    listB.Add(Read("B", positionB));
+                                }
                             }
                             else if (countOpC > 0)
                             {
-                                Write(secondRead, "A", true);
-                                popC = false;
+                                if (listC.Count != 0)
+                                {
+                                    Write(listC[0], "A", true);
+                                    listC.Clear();
+                                }
+                                countC--;
                                 countOpC--;
+                                if (positionC != maxPositionC)
+                                {
+                                    listC.Add(Read("C", positionC));
+                                }
                             }
                             countAllOp--;
-                            if (countAllOp > 0)
-                            {
-                                if (countOpB > 0)
-                                {
-                                    if (maxPositionB != positionB)
-                                    {
-                                        firstRead = Read("B", positionB);
-                                        popB = true;
-                                    }
-                                }
-                                else if (countOpC > 0)
-                                {
-                                    if (maxPositionC != positionC)
-                                    {
-                                        secondRead = Read("C", positionC);
-                                        popC = true;
-                                    }
-                                }
-                            }
                         }
                     }
                     else
                     {
-                        Write(firstRead, "A", true);
-                        popB = false;
+                        if (listB.Count != 0)
+                        {
+                            Write(listB[0], "A", true);
+                            listB.Clear();
+                        }
+                        countB--;
+                        if (maxPositionB != positionB)
+                        {
+                            listB.Add(Read("B", positionB));
+                        }
                     }
                 }
                 sizeTempData *= 2;
@@ -216,6 +214,8 @@ namespace AlgorithmsLaba4.Task2
                 ClearFile("B");
                 ClearFile("C");
                 countA = 0;
+                countB = 0;
+                countC = 0;
             }
             Console.WriteLine("Готово, нажмите Enter чтобы продолжить");
         }
@@ -311,82 +311,49 @@ namespace AlgorithmsLaba4.Task2
         {
             string path = $"..\\..\\..\\..\\TestMerge\\{namePath}.txt";
             string result = "";
-            using (FileStream sr = new FileStream(path, FileMode.Open))
+            try
             {
-                byte[] buffer = new byte[1];
-                string temp = "";
-                sr.Seek(position, SeekOrigin.Current);
-                do
+                using (FileStream sr = new FileStream(path, FileMode.Open))
                 {
-                    var a = sr.Read(buffer, 0, 1);
-                    char converToChar = (char)buffer[0];
-                    if (converToChar == '\0')
+                    byte[] buffer = new byte[1];
+                    string temp = "";
+                    sr.Seek(position, SeekOrigin.Current);
+                    do
                     {
-                        throw new Exception();
+                        var a = sr.Read(buffer, 0, 1);
+                        char convertToChar = (char)buffer[0];
+                        if (convertToChar == '\0')
+                        {
+                            throw new Exception();
+                        }
+                        temp += convertToChar;
+                    } while (buffer[0] != 32);
+                    result = temp;
+                    logger.Log(Level.INFO, $"Элемент {result} считался из файла {namePath}");
+                    if (namePath.Equals("A"))
+                    {
+                        positionA = sr.Position;
+                        maxPositionA = sr.Length;
                     }
-                    temp += converToChar;
-                } while (buffer[0] != 32);
-                result = temp;
-                logger.Log(Level.INFO, $"Элемент {result} считался из файла {namePath}");
-                if (namePath.Equals("A"))
-                {
-                    positionA = sr.Position;
-                    maxPositionA = sr.Length;
+                    else if (namePath.Equals("B"))
+                    {
+                        positionB = sr.Position;
+                        maxPositionB = sr.Length;
+                    }
+                    else if (namePath.Equals("C"))
+                    {
+                        positionC = sr.Position;
+                        maxPositionC = sr.Length;
+                    }
+                    sr.Close();
                 }
-                else if (namePath.Equals("B"))
-                {
-                    positionB = sr.Position;
-                    maxPositionB = sr.Length;
-                }
-                else if (namePath.Equals("C"))
-                {
-                    positionC = sr.Position;
-                    maxPositionC = sr.Length;
-                }
-                sr.Close();
             }
-            //try
-            //{
-            //    using (FileStream sr = new FileStream(path, FileMode.Open))
-            //    {
-            //        byte[] buffer = new byte[1];
-            //        sr.Seek(position, SeekOrigin.Current);
-            //        do
-            //        {
-            //            var a = sr.Read(buffer, 0, 1);
-            //            char converToChar = (char)buffer[0];
-            //            if (converToChar == '\0')
-            //            {
-            //                throw new Exception();
-            //            }
-            //            data += converToChar;
-            //        } while (buffer[0] != 32);
-            //        result = data;
-            //        logger.Log(Level.INFO, $"Элемент {data} считался из файла {namePath}");
-            //        if (namePath.Equals("A"))
-            //        {
-            //            positionA = sr.Position;
-            //            maxPositionA = sr.Length;
-            //        }
-            //        else if (namePath.Equals("B"))
-            //        {
-            //            positionB = sr.Position;
-            //            maxPositionB = sr.Length;
-            //        }
-            //        else if (namePath.Equals("C"))
-            //        {
-            //            positionC = sr.Position;
-            //            maxPositionC = sr.Length;
-            //        }
-            //        sr.Close();
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine("The file could not be read:");
-            //    Console.WriteLine(e.Message);
-            //    throw new Exception("Неверный формат");
-            //}
+            catch (Exception e)
+            {
+                Console.WriteLine("The file could not be read:");
+                Console.WriteLine(e.Message);
+                throw new Exception("Неверный формат");
+            }
             return int.Parse(result);
         }
         private void ClearFile(string namePath)

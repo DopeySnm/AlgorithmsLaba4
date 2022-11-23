@@ -48,13 +48,17 @@ namespace AlgorithmsLaba4.Task2
                         if (current.CompareTo(next).Equals(-1) || current.CompareTo(next).Equals(0))
                         {
                             Write(current, "B", true);
+                            countB++;
                             Write(next, "B", true);
+                            countB++;
                             break;
                         }
                         else
                         {
                             Write(current, "B", true);
+                            countB++;
                             Write(next, "C", true);
+                            countC++;
                             exit = false;
                             break;
                         }
