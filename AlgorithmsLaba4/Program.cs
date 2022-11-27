@@ -10,7 +10,7 @@ namespace AlgorithmsLaba4
     {
         static void Main(string[] args)
         {
-            string[] options = { "Вывод сортировок", "Внешние сортировки","Сортировки строк", "Exit" };
+            string[] options = { "Вывод сортировок", "Внешние сортировки", "Сортировки строк", "Exit" };
             string contents = "Лабароторная работа 4";
             do
             {

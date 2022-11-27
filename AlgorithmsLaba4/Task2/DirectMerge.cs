@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
@@ -20,6 +22,7 @@ namespace AlgorithmsLaba4.Task2
         private int countC = 0;
         private List<int> countOp;
         private Logger logger;
+        private int columNumSort;
         public DirectMerge()
         {
             logger = new Logger("Прямая сортировка");
@@ -46,167 +49,162 @@ namespace AlgorithmsLaba4.Task2
                 }
             }
         }
-        public void Sorting()
+        private void DistributionFiles(int sizeTempData)
         {
+            StreamReader streamReader = new StreamReader($"..\\..\\..\\..\\TestMerge\\A.txt");
+            string tempDataWrite;
+            do
+            {
+                for (int j = 0; j < sizeTempData / 2; j++)
+                {
+                    if (!streamReader.EndOfStream)
+                    {
+                        tempDataWrite = streamReader.ReadLine();
+                        Write(tempDataWrite, "B", true);
+                        countB++;
+                    }
+                }
+
+                for (int j = 0; j < sizeTempData / 2; j++)
+                {
+                    if (!streamReader.EndOfStream)
+                    {
+                        tempDataWrite = streamReader.ReadLine();
+                        Write(tempDataWrite, "C", true);
+                        countC++;
+                    }
+                }
+            } while (!streamReader.EndOfStream);
+            streamReader.Close();
+        }
+        private void Merging(int sizeTempData, int i)
+        {
+            StreamReader streamReaderB = new StreamReader($"..\\..\\..\\..\\TestMerge\\B.txt");
+            StreamReader streamReaderC = new StreamReader($"..\\..\\..\\..\\TestMerge\\C.txt");
+            string listB = streamReaderB.ReadLine();
+            string listC = streamReaderC.ReadLine();
+            while ((!streamReaderB.EndOfStream) || (countB != 0))
+            {
+                if ((!streamReaderC.EndOfStream) || countC != 0)// если в C закончились элементы, то дозаписываем все элементы из B
+                {
+                    int countAllOp = countOp[i];// количесво операций считования
+                    int countOpB = sizeTempData / 2;// количесво операций считования с B
+                    int countOpC = sizeTempData / 2;// количесво операций считования с С
+                    if (i == countOp.Count - 1 && countA > 2)
+                    {
+                        countOpC = countOp[i] - countOp[i - 1];
+                        // если финальные сравнения,
+                        // то кол-во операций C будет равно
+                        // кол-во всех предпоследних оперций - кол-во всех финальных операций
+                    }
+                    while (countAllOp > 0 && countC != 0)
+                    {
+                        var a = listB.Split("|")[columNumSort - 1];
+                        var b = listC.Split("|")[columNumSort - 1];
+                        if (a.CompareTo(b).Equals(-1))
+                        {
+                            if (listB != null)
+                            {
+                                Write(listB, "A", true);
+                                listB = null;
+                            }
+                            countB--;
+                            countOpB--;
+                            if (!streamReaderB.EndOfStream)
+                            {
+                                listB = streamReaderB.ReadLine();
+                            }
+                        }
+                        else
+                        {
+                            if (listC != null)
+                            {
+                                Write(listC, "A", true);
+                                listC = null;
+                            }
+                            countC--;
+                            countOpC--;
+                            if (!streamReaderC.EndOfStream)
+                            {
+                                listC = streamReaderC.ReadLine();
+                            }
+                        }
+                        countAllOp--;
+                        if (countOpB == 0 || countOpC == 0)
+                        {
+                            break;
+                        }
+                    }
+                    while (countAllOp > 0)
+                    {
+                        if (countOpB > 0)
+                        {
+                            if (listB != null)
+                            {
+                                Write(listB, "A", true);
+                                listB = null;
+                            }
+                            countB--;
+                            countOpB--;
+                            if (!streamReaderB.EndOfStream)
+                            {
+                                listB = streamReaderB.ReadLine();
+                            }
+                        }
+                        else if (countOpC > 0)
+                        {
+                            if (listC != null)
+                            {
+                                Write(listC, "A", true);
+                                listC = null;
+                            }
+                            countC--;
+                            countOpC--;
+                            if (!streamReaderC.EndOfStream)
+                            {
+                                listC = streamReaderC.ReadLine();
+                            }
+                        }
+                        countAllOp--;
+                    }
+                }
+                else
+                {
+                    if (listB != null)
+                    {
+                        Write(listB, "A", true);
+                        listB = null;
+                    }
+                    countB--;
+                    if (!streamReaderB.EndOfStream)
+                    {
+                        listB = streamReaderB.ReadLine();
+                    }
+                }
+            }
+            streamReaderB.Close();
+            streamReaderC.Close();
+        }
+        public void Sorting(int columNum)
+        {
+            columNumSort = columNum;
             bool temp = true;
             countOp = new List<int>();
             countOp.Add(2);
             int sizeTempData = 2;
-            //NaturalMerge naturalMerge = new NaturalMerge();
-            //bool exit = naturalMerge.Distribution();
-            //if (exit)
-            //{
-            //    countOp.Clear();
-            //}
-            bool readB = false;
-            bool readC = false;
             ClearFile("B");
             ClearFile("C");
-            int tempDataWrite = 0;
             for (int i = 0; i < countOp.Count; i++)
             {
-                //если последовательность остортированна то выходим (добавить метод)
-                do
-                {
-                    for (int j = 0; j < sizeTempData / 2; j++)
-                    {
-                        tempDataWrite = Read("A", positionA);
-                        Write(tempDataWrite, "B", true);
-                        countB++;
-                        if (positionA == maxPositionA)
-                        {
-                            break;
-                        }
-                    }
-                    if (maxPositionA == positionA)
-                    {
-                        break;
-                    }
-                    for (int j = 0; j < sizeTempData / 2; j++)
-                    {
-                        tempDataWrite = Read("A", positionA);
-                        Write(tempDataWrite, "C", true);
-                        countC++;
-                        if (positionA == maxPositionA)
-                        {
-                            break;
-                        }
-                    }
-                } while (maxPositionA != positionA);
+                DistributionFiles(sizeTempData);
                 countA = countB + countC;
-                if (temp) // убрать куда-то в начало и переработать
+                if (temp)
                 {
                     CountOpSet();
                     temp = false;
                 }
                 ClearFile("A");
-                if (i == 4)
-                {
-                    Console.WriteLine();
-                }
-                //int firstRead = Read("B", positionB);
-                List<int> listB = new List<int>();
-                List<int> listC = new List<int>();
-                listB.Add(Read("B", positionB));
-                listC.Add(Read("C", positionC));
-                //int secondRead = Read("C", positionC);
-                while ((maxPositionB != positionB) || (countB != 0))
-                {
-                    if (maxPositionC != positionC || countC != 0)// если в C закончились элементы, то дозаписываем все элементы из B
-                    {
-                        int countAllOp = countOp[i];// количесво операций считования
-                        int countOpB = sizeTempData / 2;// количесво операций считования с B
-                        int countOpC = sizeTempData / 2;// количесво операций считования с С
-                        if (i == countOp.Count - 1 && countA > 2)
-                        {
-                            countOpC = countOp[i] - countOp[i - 1];
-                            // если финальные сравнения,
-                            // то кол-во операций C будет равно
-                            // кол-во всех предпоследних оперций - кол-во всех финальных операций
-                        }
-                        while (countAllOp > 0 && countC != 0)
-                        {
-                            if (listB[0].CompareTo(listC[0]).Equals(-1))
-                            {
-                                if (listB.Count != 0)
-                                {
-                                    Write(listB[0], "A", true);
-                                    listB.Clear();
-                                }
-                                countB--;
-                                countOpB--;
-                                if (maxPositionB != positionB)
-                                {
-                                    listB.Add(Read("B", positionB));
-                                }
-                            }
-                            else
-                            {
-                                if (listC.Count != 0)
-                                {
-                                    Write(listC[0], "A", true);
-                                    listC.Clear();
-                                }
-                                countC--;
-                                countOpC--;
-                                if (positionC != maxPositionC)
-                                {
-                                    listC.Add(Read("C", positionC));
-                                }
-                            }
-                            countAllOp--;
-                            if (countOpB == 0 || countOpC == 0)
-                            {
-                                break;
-                            }
-                        }
-                        while (countAllOp > 0)
-                        {
-                            if (countOpB > 0)
-                            {
-                                if (listB.Count != 0)
-                                {
-                                    Write(listB[0], "A", true);
-                                    listB.Clear();
-                                }
-                                countB--;
-                                countOpB--;
-                                if (maxPositionB != positionB)
-                                {
-                                    listB.Add(Read("B", positionB));
-                                }
-                            }
-                            else if (countOpC > 0)
-                            {
-                                if (listC.Count != 0)
-                                {
-                                    Write(listC[0], "A", true);
-                                    listC.Clear();
-                                }
-                                countC--;
-                                countOpC--;
-                                if (positionC != maxPositionC)
-                                {
-                                    listC.Add(Read("C", positionC));
-                                }
-                            }
-                            countAllOp--;
-                        }
-                    }
-                    else
-                    {
-                        if (listB.Count != 0)
-                        {
-                            Write(listB[0], "A", true);
-                            listB.Clear();
-                        }
-                        countB--;
-                        if (maxPositionB != positionB)
-                        {
-                            listB.Add(Read("B", positionB));
-                        }
-                    }
-                }
+                Merging(sizeTempData, i);
                 sizeTempData *= 2;
                 positionA = 0;
                 positionB = 0;
@@ -238,15 +236,15 @@ namespace AlgorithmsLaba4.Task2
                 Console.WriteLine(e.Message);
             }
         }
-        private void Write(int data, string namePath, bool append)
+        private void Write(string data, string namePath, bool append)
         {
             string path = $"..\\..\\..\\..\\TestMerge\\{namePath}.txt";
             try
             {
-                using (StreamWriter sr = new StreamWriter(path, append))
+                using (StreamWriter streamWriter = new StreamWriter(path, append))
                 {
-                    sr.Write(data + " ");
-                    sr.Close();
+                    streamWriter.WriteLine(data);
+                    streamWriter.Close();
                     logger.Log(Level.INFO, $"Элемент {data} записался в файл {namePath}");
                 }
             }
@@ -307,7 +305,7 @@ namespace AlgorithmsLaba4.Task2
             }
             return result.ToArray();
         }
-        private int Read(string namePath, long position = 0)
+        private string Read(string namePath, long position = 0)
         {
             string path = $"..\\..\\..\\..\\TestMerge\\{namePath}.txt";
             string result = "";
@@ -327,7 +325,7 @@ namespace AlgorithmsLaba4.Task2
                             throw new Exception();
                         }
                         temp += convertToChar;
-                    } while (buffer[0] != 32);
+                    } while (buffer[0] != 10);
                     result = temp;
                     logger.Log(Level.INFO, $"Элемент {result} считался из файла {namePath}");
                     if (namePath.Equals("A"))
@@ -354,7 +352,7 @@ namespace AlgorithmsLaba4.Task2
                 Console.WriteLine(e.Message);
                 throw new Exception("Неверный формат");
             }
-            return int.Parse(result);
+            return result;
         }
         private void ClearFile(string namePath)
         {
@@ -364,6 +362,7 @@ namespace AlgorithmsLaba4.Task2
                 using (StreamWriter sr = new StreamWriter(path, false))
                 {
                     sr.Write("");
+                    sr.Close();
                 }
             }
             catch (Exception e)

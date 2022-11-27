@@ -1,25 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AlgorithmsLaba4.Task2
 {
-    internal class NaturalMerge
+    internal class MultipathMerging
     {
-        private long maxPositionA = -1;
-        private long maxPositionB = 0;
-        private long maxPositionC = -1;
-        private long positionA = 0;
-        private long positionB = 0;
-        private long positionC = 0;
-        private long countB = 0;
-        private long countC = 0;
         private Logger logger;
+        private long countB;
+        private long countC;
+        private long countD;
         private int columNumSort;
-        public NaturalMerge()
+        public MultipathMerging()
         {
             logger = new Logger("Прямая сортировка");
             IMessageHandler fileHandler = new FileHandler("NaturalMergeLog");
@@ -90,8 +86,8 @@ namespace AlgorithmsLaba4.Task2
                         }
                         else
                         {
-                            Write(next, "B", true);
-                            countB++;
+                            Write(next, "D", true);
+                            countD++;
                             streamReader.Close();
                             return exit;
                         }
@@ -115,149 +111,57 @@ namespace AlgorithmsLaba4.Task2
                         return exit;
                     }
                 } while (true);
+                do
+                {
+                    var a = current.Split("|")[columNumSort - 1];
+                    var b = next.Split("|")[columNumSort - 1];
+                    if (b.CompareTo(a).Equals(-1))
+                    {
+                        Write(current, "D", true);
+                        countD++;
+                        if (!streamReader.EndOfStream)
+                        {
+                            current = next;
+                            next = streamReader.ReadLine();
+                        }
+                        else
+                        {
+                            Write(next, "B", true);
+                            countB++;
+                            streamReader.Close();
+                            return exit;
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        Write(current, "D", true);
+                        countD++;
+                    }
+                    if (!streamReader.EndOfStream)
+                    {
+                        current = next;
+                        next = streamReader.ReadLine();
+                    }
+                    else
+                    {
+                        Write(next, "D", true);
+                        countD++;
+                        streamReader.Close();
+                        return exit;
+                    }
+                } while (true);
             } while (true);
-            //int current = Read("A", positionA);
-            //int next = 0;
-            //if (positionA == maxPositionA)
-            //{
-            //    Write(current, "B", true);
-            //    countB++;
-            //}
-            //else
-            //{
-            //    next = Read("A", positionA);
-            //}
-            //do
-            //{
-            //    do
-            //    {
-            //        if (positionA == maxPositionA)
-            //        {
-            //            if (current.CompareTo(next).Equals(-1) || current.CompareTo(next).Equals(0))
-            //            {
-            //                Write(current, "B", true);
-            //                countB++;
-            //                Write(next, "B", true);
-            //                countB++;
-            //                break;
-            //            }
-            //            else
-            //            {
-            //                Write(current, "B", true);
-            //                countB++;
-            //                Write(next, "C", true);
-            //                countC++;
-            //                exit = false;
-            //                break;
-            //            }
-            //        }
-            //        if (current.CompareTo(next).Equals(-1) || current.CompareTo(next).Equals(0))
-            //        {
-            //            Write(current, "B", true);
-            //            countB++;
-            //            current = next;
-            //            next = Read("A", positionA);
-            //        }
-            //        else
-            //        {
-            //            Write(current, "B", true);
-            //            countB++;
-            //            current = next;
-            //            next = Read("A", positionA);
-            //            break;
-            //        }
-            //    } while (positionA != maxPositionA);
-            //    if (positionA == maxPositionA)
-            //    {
-            //        if (current.CompareTo(next).Equals(-1) || current.CompareTo(next).Equals(0))
-            //        {
-            //            Write(current, "B", true);
-            //            countB++;
-            //            Write(next, "B", true);
-            //            countB++;
-            //            break;
-            //        }
-            //        else
-            //        {
-            //            Write(current, "B", true);
-            //            countB++;
-            //            Write(next, "C", true);
-            //            countC++;
-            //            exit = false;
-            //            break;
-            //        }
-            //    }
-            //    do
-            //    {
-            //        if (positionA == maxPositionA)
-            //        {
-            //            if (current.CompareTo(next).Equals(-1))
-            //            {
-            //                Write(current, "C", true);
-            //                countC++;
-            //                Write(next, "C", true);
-            //                countC++;
-            //                exit = false;
-            //                break;
-            //            }
-            //            else
-            //            {
-            //                Write(current, "C", true);
-            //                countC++;
-            //                Write(next, "B", true);
-            //                countB++;
-            //                exit = false;
-            //                break;
-            //            }
-            //        }
-            //        if (current.CompareTo(next).Equals(-1))
-            //        {
-            //            Write(current, "C", true);
-            //            countC++;
-            //            current = next;
-            //            next = Read("A", positionA);
-            //            exit = false;
-            //        }
-            //        else
-            //        {
-            //            Write(current, "C", true);
-            //            countC++;
-            //            current = next;
-            //            next = Read("A", positionA);
-            //            exit = false;
-            //            break;
-            //        }
-            //    } while (positionA != maxPositionA);
-            //    if (positionA == maxPositionA)
-            //    {
-            //        if (current.CompareTo(next).Equals(-1))
-            //        {
-            //            Write(current, "C", true);
-            //            countC++;
-            //            Write(next, "C", true);
-            //            countC++;
-            //            exit = false;
-            //            break;
-            //        }
-            //        else
-            //        {
-            //            Write(current, "C", true);
-            //            countC++;
-            //            Write(next, "B", true);
-            //            countB++;
-            //            exit = false;
-            //            break;
-            //        }
-            //    }
-            //} while (positionA != maxPositionA);
+
         }
-        public void Sorting(int columNum)
+        public void Sorting(int columNumSort)
         {
-            columNumSort = columNum;
+            this.columNumSort = columNumSort;
             do
             {
                 ClearFile("B");
                 ClearFile("C");
+                ClearFile("D");
                 bool exit = DistributionFiles();
                 if (exit)
                 {
@@ -267,13 +171,39 @@ namespace AlgorithmsLaba4.Task2
                 ClearFile("A");
                 StreamReader streamReaderB = new StreamReader($"..\\..\\..\\..\\TestMerge\\B.txt");
                 StreamReader streamReaderC = new StreamReader($"..\\..\\..\\..\\TestMerge\\C.txt");
+                StreamReader streamReaderD = new StreamReader($"..\\..\\..\\..\\TestMerge\\D.txt");
                 string currentB = null;
                 string currentC = null;
+                string currentD = null;
+                int valueExit = 2;
+                if (streamReaderD.EndOfStream)
+                {
+                    valueExit = 1;
+                }
+                int flagExit = 0;
                 string c = null;
                 string b = null;
-                int flagExit = 0;
+                string d = null;
                 do
                 {
+                    if (valueExit == 2)
+                    {
+                        if (currentD == null)
+                        {
+                            if (!streamReaderD.EndOfStream)
+                            {
+
+                                currentD = streamReaderD.ReadLine();
+                                d = currentD.Split('|')[columNumSort - 1];
+                            }
+                            else
+                            {
+                                d = null;
+                                countD = -1;
+                                flagExit++;
+                            }
+                        }
+                    }
                     if (currentB == null)
                     {
                         if (!streamReaderB.EndOfStream)
@@ -283,6 +213,11 @@ namespace AlgorithmsLaba4.Task2
                         }
                         else
                         {
+                            currentB = currentD;
+                            currentD = null;
+                            countB = countD;
+                            b = d;
+                            d = null;
                             flagExit++;
                         }
                     }
@@ -295,26 +230,81 @@ namespace AlgorithmsLaba4.Task2
                         }
                         else
                         {
+                            currentC = currentD;
+                            currentD = null;
+                            countC = countD;
+                            c = d;
+                            d = null;
                             flagExit++;
                         }
                     }
-                    if (flagExit >= 1)
+                    if (flagExit >= valueExit)
                     {
                         break;
                     }
                     flagExit = 0;
-
                     if (b.CompareTo(c).Equals(-1))
                     {
-                        if (currentB != null)
+                        if (d != null)
                         {
-                            Write(currentB, "A", true);
-                            currentB = null;
-                            countB--;
+                            if (b.CompareTo(d).Equals(-1))
+                            {
+                                if (currentB != null)
+                                {
+                                    Write(currentB, "A", true);
+                                    currentB = null;
+                                    countB--;
+                                }
+                            }
+                            else if (b.CompareTo(d).Equals(0))
+                            {
+                                if (currentB != null)
+                                {
+                                    Write(currentB, "A", true);
+                                    currentB = null;
+                                    countB--;
+                                }
+                                if (currentD != null)
+                                {
+                                    Write(currentD, "A", true);
+                                    currentD = null;
+                                    countD--;
+                                }
+                            }
+                            else
+                            {
+                                if (currentD != null)
+                                {
+                                    Write(currentD, "A", true);
+                                    currentD = null;
+                                    countD--;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (currentB != null)
+                            {
+                                Write(currentB, "A", true);
+                                currentB = null;
+                                countB--;
+                            }
                         }
                     }
                     else if (b.CompareTo(c).Equals(0))
                     {
+                        if (d != null)
+                        {
+                            if (b.CompareTo(d).Equals(0))
+                            {
+                                if (currentD != null)
+                                {
+                                    Write(currentD, "A", true);
+                                    currentD = null;
+                                    countD--;
+                                }
+                            }
+                        }
                         if (currentB != null)
                         {
                             Write(currentB, "A", true);
@@ -330,26 +320,69 @@ namespace AlgorithmsLaba4.Task2
                     }
                     else
                     {
-                        if (currentC != null)
+                        if (d != null)
                         {
-                            Write(currentC, "A", true);
-                            currentC = null;
-                            countC--;
+                            if (c.CompareTo(d).Equals(-1))
+                            {
+                                if (currentC != null)
+                                {
+                                    Write(currentC, "A", true);
+                                    currentC = null;
+                                    countC--;
+                                }
+                            }
+                            else if (c.CompareTo(d).Equals(0))
+                            {
+                                if (currentC != null)
+                                {
+                                    Write(currentC, "A", true);
+                                    currentC = null;
+                                    countC--;
+                                }
+                                if (currentD != null)
+                                {
+                                    Write(currentD, "A", true);
+                                    currentD = null;
+                                    countD--;
+                                }
+                            }
+                            else
+                            {
+                                if (currentD != null)
+                                {
+                                    Write(currentD, "A", true);
+                                    currentD = null;
+                                    countD--;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (currentC != null)
+                            {
+                                Write(currentC, "A", true);
+                                currentC = null;
+                                countC--;
+                            }
                         }
                     }
                 } while (true);
-                //while (!streamReaderB.EndOfStream)
-                //{
-                //    if (currentB != null)
-                //    {
-                //        Write(currentB, "A", true);
-                //        currentB = null;
-                //    }
-                //    if (!streamReaderB.EndOfStream)
-                //    {
-                //        currentB = streamReaderB.ReadLine();
-                //    }
-                //}
+                while (true)
+                {
+                    if (currentD != null)
+                    {
+                        Write(currentD, "A", true);
+                        currentD = null;
+                    }
+                    if (!streamReaderD.EndOfStream)
+                    {
+                        currentD = streamReaderD.ReadLine();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
                 while (true)
                 {
                     if (currentB != null)
@@ -384,28 +417,9 @@ namespace AlgorithmsLaba4.Task2
                 }
                 streamReaderB.Close();
                 streamReaderC.Close();
-                positionA = 0;
-                positionB = 0;
-                positionC = 0;
+                streamReaderD.Close();
             } while (true);
             Console.WriteLine("Готово, нажмите Enter чтобы продолжить");
-        }
-        private void ClearFile(string namePath)
-        {
-            string path = $"..\\..\\..\\..\\TestMerge\\{namePath}.txt";
-            try
-            {
-                using (StreamWriter streamWriter = new StreamWriter(path, false))
-                {
-                    streamWriter.Write("");
-                    streamWriter.Close();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("The file could not be write:");
-                Console.WriteLine(e.Message);
-            }
         }
         private int Read(string namePath, long position = 0)
         {
@@ -430,21 +444,6 @@ namespace AlgorithmsLaba4.Task2
                     } while (buffer[0] != 32);
                     result = temp;
                     logger.Log(Level.INFO, $"Элемент {result} считался из файла {namePath}");
-                    if (namePath.Equals("A"))
-                    {
-                        positionA = sr.Position;
-                        maxPositionA = sr.Length;
-                    }
-                    else if (namePath.Equals("B"))
-                    {
-                        positionB = sr.Position;
-                        maxPositionB = sr.Length;
-                    }
-                    else if (namePath.Equals("C"))
-                    {
-                        positionC = sr.Position;
-                        maxPositionC = sr.Length;
-                    }
                     sr.Close();
                 }
             }
@@ -466,6 +465,23 @@ namespace AlgorithmsLaba4.Task2
                     streamWriter.WriteLine(data);
                     streamWriter.Close();
                     logger.Log(Level.INFO, $"Элемент {data} записался в файл {namePath}");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("The file could not be write:");
+                Console.WriteLine(e.Message);
+            }
+        }
+        private void ClearFile(string namePath)
+        {
+            string path = $"..\\..\\..\\..\\TestMerge\\{namePath}.txt";
+            try
+            {
+                using (StreamWriter streamWriter = new StreamWriter(path, false))
+                {
+                    streamWriter.Write("");
+                    streamWriter.Close();
                 }
             }
             catch (Exception e)
