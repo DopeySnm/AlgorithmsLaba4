@@ -15,7 +15,10 @@ namespace AlgorithmsLaba4
         {
             this.pathName = pathName;
             string path = $"..\\..\\..\\..\\Log\\{pathName}.txt";
-            File.WriteAllText(pathName, "");
+            StreamWriter sr = new StreamWriter(path, false);
+            sr.WriteLine("");
+            sr.Close();
+            //File.WriteAllText(pathName, "");
         }
         public void Publish(RecordLog recordLog)
         {

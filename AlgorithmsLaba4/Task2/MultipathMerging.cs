@@ -17,8 +17,8 @@ namespace AlgorithmsLaba4.Task2
         private int columNumSort;
         public MultipathMerging()
         {
-            logger = new Logger("Прямая сортировка");
-            IMessageHandler fileHandler = new FileHandler("NaturalMergeLog");
+            logger = new Logger("Трёх путевая");
+            IMessageHandler fileHandler = new FileHandler("MultipathMergingLog");
             logger.addMessageHandler(fileHandler);
             logger.SetLevel(Level.INFO);
         }
@@ -27,7 +27,9 @@ namespace AlgorithmsLaba4.Task2
             StreamReader streamReader = new StreamReader($"..\\..\\..\\..\\TestMerge\\A.txt");
             bool exit = true;
             string current = streamReader.ReadLine();
+            logger.Log(Level.INFO, $"Считываем из А {current}");
             string next = streamReader.ReadLine();
+            logger.Log(Level.INFO, $"Считываем из А {next}");
             do
             {
                 do
@@ -43,6 +45,7 @@ namespace AlgorithmsLaba4.Task2
                         {
                             current = next;
                             next = streamReader.ReadLine();
+                            logger.Log(Level.INFO, $"Считываем из А {next}");
                         }
                         else
                         {
@@ -62,6 +65,7 @@ namespace AlgorithmsLaba4.Task2
                     {
                         current = next;
                         next = streamReader.ReadLine();
+                        logger.Log(Level.INFO, $"Считываем из А {next}");
                     }
                     else
                     {
@@ -83,6 +87,7 @@ namespace AlgorithmsLaba4.Task2
                         {
                             current = next;
                             next = streamReader.ReadLine();
+                            logger.Log(Level.INFO, $"Считываем из А {next}");
                         }
                         else
                         {
@@ -102,6 +107,7 @@ namespace AlgorithmsLaba4.Task2
                     {
                         current = next;
                         next = streamReader.ReadLine();
+                        logger.Log(Level.INFO, $"Считываем из А {next}");
                     }
                     else
                     {
@@ -123,6 +129,7 @@ namespace AlgorithmsLaba4.Task2
                         {
                             current = next;
                             next = streamReader.ReadLine();
+                            logger.Log(Level.INFO, $"Считываем из А {next}");
                         }
                         else
                         {
@@ -142,6 +149,7 @@ namespace AlgorithmsLaba4.Task2
                     {
                         current = next;
                         next = streamReader.ReadLine();
+                        logger.Log(Level.INFO, $"Считываем из А {next}");
                     }
                     else
                     {
@@ -162,6 +170,7 @@ namespace AlgorithmsLaba4.Task2
                 ClearFile("B");
                 ClearFile("C");
                 ClearFile("D");
+                logger.Log(Level.INFO, $"Распределяем файл A");
                 bool exit = DistributionFiles();
                 if (exit)
                 {
@@ -192,9 +201,9 @@ namespace AlgorithmsLaba4.Task2
                         {
                             if (!streamReaderD.EndOfStream)
                             {
-
                                 currentD = streamReaderD.ReadLine();
                                 d = currentD.Split('|')[columNumSort - 1];
+                                logger.Log(Level.INFO, $"Считываем строку {currentD}");
                             }
                             else
                             {
@@ -210,6 +219,7 @@ namespace AlgorithmsLaba4.Task2
                         {
                             currentB = streamReaderB.ReadLine();
                             b = currentB.Split('|')[columNumSort - 1];
+                            logger.Log(Level.INFO, $"Считываем строку {currentB}");
                         }
                         else
                         {
@@ -227,6 +237,7 @@ namespace AlgorithmsLaba4.Task2
                         {
                             currentC = streamReaderC.ReadLine();
                             c = currentC.Split('|')[columNumSort - 1];
+                            logger.Log(Level.INFO, $"Считываем строку {currentC}");
                         }
                         else
                         {
@@ -243,10 +254,12 @@ namespace AlgorithmsLaba4.Task2
                         break;
                     }
                     flagExit = 0;
+                    logger.Log(Level.INFO, $"Сравниваем {b} и {c}");
                     if (b.CompareTo(c).Equals(-1))
                     {
                         if (d != null)
                         {
+                            logger.Log(Level.INFO, $"Сравниваем {b} и {c}");
                             if (b.CompareTo(d).Equals(-1))
                             {
                                 if (currentB != null)
@@ -295,6 +308,7 @@ namespace AlgorithmsLaba4.Task2
                     {
                         if (d != null)
                         {
+                            logger.Log(Level.INFO, $"Сравниваем {b} и {d}");
                             if (b.CompareTo(d).Equals(0))
                             {
                                 if (currentD != null)
@@ -322,6 +336,7 @@ namespace AlgorithmsLaba4.Task2
                     {
                         if (d != null)
                         {
+                            logger.Log(Level.INFO, $"Сравниваем {c} и {d}");
                             if (c.CompareTo(d).Equals(-1))
                             {
                                 if (currentC != null)
@@ -419,6 +434,7 @@ namespace AlgorithmsLaba4.Task2
                 streamReaderC.Close();
                 streamReaderD.Close();
             } while (true);
+            logger.Log(Level.INFO, $"Отсортированно");
             Console.WriteLine("Готово, нажмите Enter чтобы продолжить");
         }
         private int Read(string namePath, long position = 0)
@@ -475,6 +491,7 @@ namespace AlgorithmsLaba4.Task2
         }
         private void ClearFile(string namePath)
         {
+            logger.Log(Level.INFO, $"Очищаем файл{namePath}");
             string path = $"..\\..\\..\\..\\TestMerge\\{namePath}.txt";
             try
             {

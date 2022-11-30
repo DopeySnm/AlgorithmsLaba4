@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AlgorithmsLaba4.Task2
 {
@@ -60,16 +61,17 @@ namespace AlgorithmsLaba4.Task2
                     if (!streamReader.EndOfStream)
                     {
                         tempDataWrite = streamReader.ReadLine();
+                        logger.Log(Level.INFO, $"Считываем из А {tempDataWrite}");
                         Write(tempDataWrite, "B", true);
                         countB++;
                     }
                 }
-
                 for (int j = 0; j < sizeTempData / 2; j++)
                 {
                     if (!streamReader.EndOfStream)
                     {
                         tempDataWrite = streamReader.ReadLine();
+                        logger.Log(Level.INFO, $"Считываем из А {tempDataWrite}");
                         Write(tempDataWrite, "C", true);
                         countC++;
                     }
@@ -81,8 +83,10 @@ namespace AlgorithmsLaba4.Task2
         {
             StreamReader streamReaderB = new StreamReader($"..\\..\\..\\..\\TestMerge\\B.txt");
             StreamReader streamReaderC = new StreamReader($"..\\..\\..\\..\\TestMerge\\C.txt");
-            string listB = streamReaderB.ReadLine();
-            string listC = streamReaderC.ReadLine();
+            string currentB = streamReaderB.ReadLine();
+            logger.Log(Level.INFO, $"Считываем из А {currentB}");
+            string currentC = streamReaderC.ReadLine();
+            logger.Log(Level.INFO, $"Считываем из А {currentC}");
             while ((!streamReaderB.EndOfStream) || (countB != 0))
             {
                 if ((!streamReaderC.EndOfStream) || countC != 0)// если в C закончились элементы, то дозаписываем все элементы из B
@@ -99,34 +103,37 @@ namespace AlgorithmsLaba4.Task2
                     }
                     while (countAllOp > 0 && countC != 0)
                     {
-                        var a = listB.Split("|")[columNumSort - 1];
-                        var b = listC.Split("|")[columNumSort - 1];
+                        var a = currentB.Split("|")[columNumSort - 1];
+                        var b = currentC.Split("|")[columNumSort - 1];
+                        logger.Log(Level.INFO, $"Сравниваем {a} и {b}");
                         if (a.CompareTo(b).Equals(-1))
                         {
-                            if (listB != null)
+                            if (currentB != null)
                             {
-                                Write(listB, "A", true);
-                                listB = null;
+                                Write(currentB, "A", true);
+                                currentB = null;
                             }
                             countB--;
                             countOpB--;
                             if (!streamReaderB.EndOfStream)
                             {
-                                listB = streamReaderB.ReadLine();
+                                currentB = streamReaderB.ReadLine();
+                                logger.Log(Level.INFO, $"Считываем из А {currentB}");
                             }
                         }
                         else
                         {
-                            if (listC != null)
+                            if (currentC != null)
                             {
-                                Write(listC, "A", true);
-                                listC = null;
+                                Write(currentC, "A", true);
+                                currentC = null;
                             }
                             countC--;
                             countOpC--;
                             if (!streamReaderC.EndOfStream)
                             {
-                                listC = streamReaderC.ReadLine();
+                                currentC = streamReaderC.ReadLine();
+                                logger.Log(Level.INFO, $"Считываем из А {currentC}");
                             }
                         }
                         countAllOp--;
@@ -139,30 +146,32 @@ namespace AlgorithmsLaba4.Task2
                     {
                         if (countOpB > 0)
                         {
-                            if (listB != null)
+                            if (currentB != null)
                             {
-                                Write(listB, "A", true);
-                                listB = null;
+                                Write(currentB, "A", true);
+                                currentB = null;
                             }
                             countB--;
                             countOpB--;
                             if (!streamReaderB.EndOfStream)
                             {
-                                listB = streamReaderB.ReadLine();
+                                currentB = streamReaderB.ReadLine();
+                                logger.Log(Level.INFO, $"Считываем из А {currentB}");
                             }
                         }
                         else if (countOpC > 0)
                         {
-                            if (listC != null)
+                            if (currentC != null)
                             {
-                                Write(listC, "A", true);
-                                listC = null;
+                                Write(currentC, "A", true);
+                                currentC = null;
                             }
                             countC--;
                             countOpC--;
                             if (!streamReaderC.EndOfStream)
                             {
-                                listC = streamReaderC.ReadLine();
+                                currentC = streamReaderC.ReadLine();
+                                logger.Log(Level.INFO, $"Считываем из А {currentC}");
                             }
                         }
                         countAllOp--;
@@ -170,15 +179,16 @@ namespace AlgorithmsLaba4.Task2
                 }
                 else
                 {
-                    if (listB != null)
+                    if (currentB != null)
                     {
-                        Write(listB, "A", true);
-                        listB = null;
+                        Write(currentB, "A", true);
+                        currentB = null;
                     }
                     countB--;
                     if (!streamReaderB.EndOfStream)
                     {
-                        listB = streamReaderB.ReadLine();
+                        currentB = streamReaderB.ReadLine();
+                        logger.Log(Level.INFO, $"Считываем из А {currentB}");
                     }
                 }
             }
@@ -215,6 +225,7 @@ namespace AlgorithmsLaba4.Task2
                 countB = 0;
                 countC = 0;
             }
+            logger.Log(Level.INFO, $"Отсортированно");
             Console.WriteLine("Готово, нажмите Enter чтобы продолжить");
         }
         private void Write(int[] data, string namePath, bool append)
