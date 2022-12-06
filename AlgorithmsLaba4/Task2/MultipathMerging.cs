@@ -181,71 +181,211 @@ namespace AlgorithmsLaba4.Task2
                 StreamReader streamReaderB = new StreamReader($"..\\..\\..\\..\\TestMerge\\B.txt");
                 StreamReader streamReaderC = new StreamReader($"..\\..\\..\\..\\TestMerge\\C.txt");
                 StreamReader streamReaderD = new StreamReader($"..\\..\\..\\..\\TestMerge\\D.txt");
-                string currentB = null;
-                string currentC = null;
+                string stringPrevB = null;
+                string stringPrevC = null;
+                string stringPrevD = null;
+                string stringCurrentB = streamReaderB.ReadLine();
+                logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с C");
+                string stringCurrentC = streamReaderC.ReadLine();
+                logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с C");
+                string stringCurrentD = null;
+                string prevC = null;
+                string prevB = null;
+                string prevD = null;
+                string currentC = stringCurrentC.Split('|')[columNumSort - 1];
+                string currentB = stringCurrentB.Split('|')[columNumSort - 1];
                 string currentD = null;
                 int valueExit = 2;
                 if (streamReaderD.EndOfStream)
                 {
                     valueExit = 1;
+                    stringCurrentD = streamReaderD.ReadLine();
+                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentD} с C");
+                    currentD = stringCurrentD.Split('|')[columNumSort - 1];
                 }
                 int flagExit = 0;
-                string c = null;
-                string b = null;
-                string d = null;
                 do
                 {
-                    if (valueExit == 2)
+                    if (currentB.CompareTo(currentC).Equals(-1))
                     {
-                        if (currentD == null)
+                        if (currentD != null)
                         {
-                            if (!streamReaderD.EndOfStream)
+                            logger.Log(Level.INFO, $"Сравниваем {currentB} и {currentC}");
+                            if (currentB.CompareTo(currentD).Equals(-1))
                             {
-                                currentD = streamReaderD.ReadLine();
-                                d = currentD.Split('|')[columNumSort - 1];
-                                logger.Log(Level.INFO, $"Считываем строку {currentD}");
+                                if (stringCurrentB != null)
+                                {
+                                    Write(stringCurrentB, "A", true);
+                                    stringCurrentB = null;
+                                    countB--;
+                                }
+                            }
+                            else if (currentB.CompareTo(currentD).Equals(0))
+                            {
+                                if (stringCurrentB != null)
+                                {
+                                    Write(stringCurrentB, "A", true);
+                                    stringCurrentB = null;
+                                    countB--;
+                                }
+                                if (stringCurrentD != null)
+                                {
+                                    Write(stringCurrentD, "A", true);
+                                    stringCurrentD = null;
+                                    countD--;
+                                }
                             }
                             else
                             {
-                                d = null;
+                                if (stringCurrentD != null)
+                                {
+                                    Write(stringCurrentD, "A", true);
+                                    stringCurrentD = null;
+                                    countD--;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (stringCurrentB != null)
+                            {
+                                Write(stringCurrentB, "A", true);
+                                stringCurrentB = null;
+                                countB--;
+                            }
+                        }
+                    }
+                    else if (currentB.CompareTo(currentC).Equals(0))
+                    {
+                        if (currentD != null)
+                        {
+                            logger.Log(Level.INFO, $"Сравниваем {currentB} и {currentD}");
+                            if (currentB.CompareTo(currentD).Equals(0))
+                            {
+                                if (stringCurrentD != null)
+                                {
+                                    Write(stringCurrentD, "A", true);
+                                    stringCurrentD = null;
+                                    countD--;
+                                }
+                            }
+                        }
+                        if (stringCurrentB != null)
+                        {
+                            Write(stringCurrentB, "A", true);
+                            stringCurrentB = null;
+                            countB--;
+                        }
+                        if (stringCurrentC != null)
+                        {
+                            Write(stringCurrentC, "A", true);
+                            stringCurrentC = null;
+                            countC--;
+                        }
+                    }
+                    else
+                    {
+                        if (currentD != null)
+                        {
+                            logger.Log(Level.INFO, $"Сравниваем {currentC} и {currentD}");
+                            if (currentC.CompareTo(currentD).Equals(-1))
+                            {
+                                if (stringCurrentC != null)
+                                {
+                                    Write(stringCurrentC, "A", true);
+                                    stringCurrentC = null;
+                                    countC--;
+                                }
+                            }
+                            else if (currentC.CompareTo(currentD).Equals(0))
+                            {
+                                if (stringCurrentC != null)
+                                {
+                                    Write(stringCurrentC, "A", true);
+                                    stringCurrentC = null;
+                                    countC--;
+                                }
+                                if (stringCurrentD != null)
+                                {
+                                    Write(stringCurrentD, "A", true);
+                                    stringCurrentD = null;
+                                    countD--;
+                                }
+                            }
+                            else
+                            {
+                                if (stringCurrentD != null)
+                                {
+                                    Write(stringCurrentD, "A", true);
+                                    stringCurrentD = null;
+                                    countD--;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (stringCurrentC != null)
+                            {
+                                Write(stringCurrentC, "A", true);
+                                stringCurrentC = null;
+                                countC--;
+                            }
+                        }
+                    }
+                    if (valueExit == 2)
+                    {
+                        if (stringCurrentD == null)
+                        {
+                            if (!streamReaderD.EndOfStream)
+                            {
+                                prevD = currentD;
+                                stringCurrentD = streamReaderD.ReadLine();
+                                currentD = stringCurrentD.Split('|')[columNumSort - 1];
+                                logger.Log(Level.INFO, $"Считываем строку {stringCurrentD}");
+                            }
+                            else
+                            {
+                                currentD = null;
                                 countD = -1;
                                 flagExit++;
                             }
                         }
                     }
-                    if (currentB == null)
+                    if (stringCurrentB == null)
                     {
                         if (!streamReaderB.EndOfStream)
                         {
-                            currentB = streamReaderB.ReadLine();
-                            b = currentB.Split('|')[columNumSort - 1];
-                            logger.Log(Level.INFO, $"Считываем строку {currentB}");
+                            prevB = currentB;
+                            stringCurrentB = streamReaderB.ReadLine();
+                            currentB = stringCurrentB.Split('|')[columNumSort - 1];
+                            logger.Log(Level.INFO, $"Считываем строку {stringCurrentB}");
                         }
                         else
                         {
+                            stringCurrentB = stringCurrentD;
+                            stringCurrentD = null;
+                            countB = countD;
                             currentB = currentD;
                             currentD = null;
-                            countB = countD;
-                            b = d;
-                            d = null;
                             flagExit++;
                         }
                     }
-                    if (currentC == null)
+                    if (stringCurrentC == null)
                     {
                         if (!streamReaderC.EndOfStream)
                         {
-                            currentC = streamReaderC.ReadLine();
-                            c = currentC.Split('|')[columNumSort - 1];
-                            logger.Log(Level.INFO, $"Считываем строку {currentC}");
+                            prevC = currentC;
+                            stringCurrentC = streamReaderC.ReadLine();
+                            currentC = stringCurrentC.Split('|')[columNumSort - 1];
+                            logger.Log(Level.INFO, $"Считываем строку {stringCurrentC}");
                         }
                         else
                         {
+                            stringCurrentC = stringCurrentD;
+                            stringCurrentD = null;
+                            countC = countD;
                             currentC = currentD;
                             currentD = null;
-                            countC = countD;
-                            c = d;
-                            d = null;
                             flagExit++;
                         }
                     }
@@ -254,144 +394,184 @@ namespace AlgorithmsLaba4.Task2
                         break;
                     }
                     flagExit = 0;
-                    logger.Log(Level.INFO, $"Сравниваем {b} и {c}");
-                    if (b.CompareTo(c).Equals(-1))
+                    if (prevD != null)
                     {
-                        if (d != null)
+                        if (prevD.CompareTo(currentD).Equals(1))
                         {
-                            logger.Log(Level.INFO, $"Сравниваем {b} и {c}");
-                            if (b.CompareTo(d).Equals(-1))
+                            if (prevC == null)
                             {
-                                if (currentB != null)
+                                prevC = currentC;
+                            }
+                            while (!prevC.CompareTo(currentC).Equals(1))
+                            {
+                                Write(stringCurrentC, "A", true);
+                                if (!streamReaderC.EndOfStream)
                                 {
-                                    Write(currentB, "A", true);
-                                    currentB = null;
-                                    countB--;
+                                    stringPrevC = stringCurrentC;
+                                    prevC = currentC;
+                                    stringCurrentC = streamReaderC.ReadLine();
+                                    currentC = stringCurrentC.Split('|')[columNumSort - 1];
+                                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с А");
+                                }
+                                else
+                                {
+                                    stringCurrentC = null;
+                                    break;
                                 }
                             }
-                            else if (b.CompareTo(d).Equals(0))
+                            prevC = null;
+                            stringPrevC = null;
+                            if (prevB == null)
                             {
-                                if (currentB != null)
+                                prevB = currentB;
+                            }
+                            while (!prevB.CompareTo(currentB).Equals(1))
+                            {
+                                Write(stringCurrentB, "A", true);
+                                if (!streamReaderB.EndOfStream)
                                 {
-                                    Write(currentB, "A", true);
-                                    currentB = null;
-                                    countB--;
+                                    stringPrevB = stringCurrentB;
+                                    prevB = currentB;
+                                    stringCurrentB = streamReaderB.ReadLine();
+                                    currentB = stringCurrentB.Split('|')[columNumSort - 1];
+                                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с А");
                                 }
-                                if (currentD != null)
+                                else
                                 {
-                                    Write(currentD, "A", true);
-                                    currentD = null;
-                                    countD--;
+                                    stringCurrentB = null;
+                                    break;
                                 }
                             }
-                            else
-                            {
-                                if (currentD != null)
-                                {
-                                    Write(currentD, "A", true);
-                                    currentD = null;
-                                    countD--;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (currentB != null)
-                            {
-                                Write(currentB, "A", true);
-                                currentB = null;
-                                countB--;
-                            }
+                            prevB = null;
+                            stringPrevB = null;
+                            continue;
                         }
                     }
-                    else if (b.CompareTo(c).Equals(0))
+                    if (prevB != null)
                     {
-                        if (d != null)
+                        if (prevB.CompareTo(currentB).Equals(1))
                         {
-                            logger.Log(Level.INFO, $"Сравниваем {b} и {d}");
-                            if (b.CompareTo(d).Equals(0))
+                            if (prevC == null)
                             {
-                                if (currentD != null)
+                                prevC = currentC;
+                            }
+                            while (!prevC.CompareTo(currentC).Equals(1))
+                            {
+                                Write(stringCurrentC, "A", true);
+                                if (!streamReaderC.EndOfStream)
                                 {
-                                    Write(currentD, "A", true);
-                                    currentD = null;
-                                    countD--;
+                                    stringPrevC = stringCurrentC;
+                                    prevC = currentC;
+                                    stringCurrentC = streamReaderC.ReadLine();
+                                    currentC = stringCurrentC.Split('|')[columNumSort - 1];
+                                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с А");
+                                }
+                                else
+                                {
+                                    stringCurrentC = null;
+                                    break;
                                 }
                             }
-                        }
-                        if (currentB != null)
-                        {
-                            Write(currentB, "A", true);
-                            currentB = null;
-                            countB--;
-                        }
-                        if (currentC != null)
-                        {
-                            Write(currentC, "A", true);
-                            currentC = null;
-                            countC--;
+                            prevC = null;
+                            stringPrevC = null;
+                            if (valueExit == 2)
+                            {
+                                if (prevD == null)
+                                {
+                                    prevD = currentD;
+                                }
+                                while (!prevD.CompareTo(currentD).Equals(1))
+                                {
+                                    Write(stringCurrentD, "A", true);
+                                    if (!streamReaderD.EndOfStream)
+                                    {
+                                        stringPrevD = stringCurrentD;
+                                        prevD = currentD;
+                                        stringCurrentD = streamReaderD.ReadLine();
+                                        currentD = stringCurrentD.Split('|')[columNumSort - 1];
+                                        logger.Log(Level.INFO, $"Считываем строку {stringCurrentD} с А");
+                                    }
+                                    else
+                                    {
+                                        stringCurrentD = null;
+                                        break;
+                                    }
+                                }
+                                prevD = null;
+                                stringPrevD = null;
+                            }
+                            continue;
                         }
                     }
-                    else
+                    if (prevC != null)
                     {
-                        if (d != null)
+                        if (prevC.CompareTo(currentC).Equals(1))
                         {
-                            logger.Log(Level.INFO, $"Сравниваем {c} и {d}");
-                            if (c.CompareTo(d).Equals(-1))
+                            if (prevB == null)
                             {
-                                if (currentC != null)
+                                prevB = currentB;
+                            }
+                            while (!prevB.CompareTo(currentB).Equals(1))
+                            {
+                                Write(stringCurrentB, "A", true);
+                                if (!streamReaderB.EndOfStream)
                                 {
-                                    Write(currentC, "A", true);
-                                    currentC = null;
-                                    countC--;
+                                    stringPrevB = stringCurrentB;
+                                    prevB = currentB;
+                                    stringCurrentB = streamReaderB.ReadLine();
+                                    currentB = stringCurrentB.Split('|')[columNumSort - 1];
+                                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с А");
+                                }
+                                else
+                                {
+                                    stringCurrentB = null;
+                                    break;
                                 }
                             }
-                            else if (c.CompareTo(d).Equals(0))
+                            prevB = null;
+                            stringPrevB = null;
+                            if (valueExit == 2)
                             {
-                                if (currentC != null)
+                                if (prevD == null)
                                 {
-                                    Write(currentC, "A", true);
-                                    currentC = null;
-                                    countC--;
+                                    prevD = currentD;
                                 }
-                                if (currentD != null)
+                                while (!prevD.CompareTo(currentD).Equals(1))
                                 {
-                                    Write(currentD, "A", true);
-                                    currentD = null;
-                                    countD--;
+                                    Write(stringCurrentD, "A", true);
+                                    if (!streamReaderD.EndOfStream)
+                                    {
+                                        stringPrevD = stringCurrentD;
+                                        prevD = currentD;
+                                        stringCurrentD = streamReaderD.ReadLine();
+                                        currentD = stringCurrentD.Split('|')[columNumSort - 1];
+                                        logger.Log(Level.INFO, $"Считываем строку {stringCurrentD} с А");
+                                    }
+                                    else
+                                    {
+                                        stringCurrentD = null;
+                                        break;
+                                    }
                                 }
+                                prevD = null;
+                                stringPrevD = null;
                             }
-                            else
-                            {
-                                if (currentD != null)
-                                {
-                                    Write(currentD, "A", true);
-                                    currentD = null;
-                                    countD--;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (currentC != null)
-                            {
-                                Write(currentC, "A", true);
-                                currentC = null;
-                                countC--;
-                            }
+                            continue;
                         }
                     }
+                    logger.Log(Level.INFO, $"Сравниваем {currentB} и {currentC}");
+                    
                 } while (true);
                 while (true)
                 {
-                    if (currentD != null)
+                    if (stringCurrentD != null)
                     {
-                        Write(currentD, "A", true);
-                        currentD = null;
+                        Write(stringCurrentD, "A", true);
+                        stringCurrentD = null;
                     }
                     if (!streamReaderD.EndOfStream)
                     {
-                        currentD = streamReaderD.ReadLine();
+                        stringCurrentD = streamReaderD.ReadLine();
                     }
                     else
                     {
@@ -400,14 +580,14 @@ namespace AlgorithmsLaba4.Task2
                 }
                 while (true)
                 {
-                    if (currentB != null)
+                    if (stringCurrentB != null)
                     {
-                        Write(currentB, "A", true);
-                        currentB = null;
+                        Write(stringCurrentB, "A", true);
+                        stringCurrentB = null;
                     }
                     if (!streamReaderB.EndOfStream)
                     {
-                        currentB = streamReaderB.ReadLine();
+                        stringCurrentB = streamReaderB.ReadLine();
                     }
                     else
                     {
@@ -416,14 +596,14 @@ namespace AlgorithmsLaba4.Task2
                 }
                 while (true)
                 {
-                    if (currentC != null)
+                    if (stringCurrentC != null)
                     {
-                        Write(currentC, "A", true);
-                        currentC = null;
+                        Write(stringCurrentC, "A", true);
+                        stringCurrentC = null;
                     }
                     if (!streamReaderC.EndOfStream)
                     {
-                        currentC = streamReaderC.ReadLine();
+                        stringCurrentC = streamReaderC.ReadLine();
                     }
                     else
                     {
