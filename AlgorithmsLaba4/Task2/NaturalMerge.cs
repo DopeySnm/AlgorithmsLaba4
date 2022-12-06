@@ -11,26 +11,21 @@ namespace AlgorithmsLaba4.Task2
 {
     internal class NaturalMerge
     {
-        private long maxPositionA = -1;
-        private long maxPositionB = 0;
-        private long maxPositionC = -1;
-        private long positionA = 0;
-        private long positionB = 0;
-        private long positionC = 0;
-        private long countB = 0;
-        private long countC = 0;
         private Logger logger;
         private int columNumSort;
         public NaturalMerge()
         {
             logger = new Logger("Естественная");
             IMessageHandler fileHandler = new FileHandler("NaturalMergeLog");
+            IMessageHandler consoleHandler = new ConsoleHandler();
             logger.addMessageHandler(fileHandler);
+            logger.addMessageHandler(consoleHandler);
             logger.SetLevel(Level.INFO);
         }
-        private bool DistributionFiles()
+        private bool DistributionFiles(string readFileName)
         {
-            StreamReader streamReader = new StreamReader($"..\\..\\..\\..\\TestMerge\\A.txt");
+            logger.Log(Level.INFO, $"Проверка выхода");
+            StreamReader streamReader = new StreamReader($"..\\..\\..\\..\\TestMerge\\{readFileName}.txt");
             bool exit = true;
             string current = streamReader.ReadLine();
             logger.Log(Level.INFO, $"Считываем из А {current}");
@@ -45,7 +40,6 @@ namespace AlgorithmsLaba4.Task2
                     if (b.CompareTo(a).Equals(-1))
                     {
                         Write(current, "B", true);
-                        countB++;
                         exit = false;
                         if (!streamReader.EndOfStream)
                         {
@@ -56,7 +50,6 @@ namespace AlgorithmsLaba4.Task2
                         else
                         {
                             Write(next, "C", true);
-                            countC++;
                             streamReader.Close();
                             return exit;
                         }
@@ -65,7 +58,6 @@ namespace AlgorithmsLaba4.Task2
                     else
                     {
                         Write(current, "B", true);
-                        countB++;
                     }
                     if (!streamReader.EndOfStream)
                     {
@@ -76,7 +68,6 @@ namespace AlgorithmsLaba4.Task2
                     else
                     {
                         Write(next, "B", true);
-                        countB++;
                         streamReader.Close();
                         return exit;
                     }
@@ -88,7 +79,6 @@ namespace AlgorithmsLaba4.Task2
                     if (b.CompareTo(a).Equals(-1))
                     {
                         Write(current, "C", true);
-                        countC++;
                         if (!streamReader.EndOfStream)
                         {
                             current = next;
@@ -98,7 +88,6 @@ namespace AlgorithmsLaba4.Task2
                         else
                         {
                             Write(next, "B", true);
-                            countB++;
                             streamReader.Close();
                             return exit;
                         }
@@ -107,7 +96,6 @@ namespace AlgorithmsLaba4.Task2
                     else
                     {
                         Write(current, "C", true);
-                        countC++;
                     }
                     if (!streamReader.EndOfStream)
                     {
@@ -118,7 +106,6 @@ namespace AlgorithmsLaba4.Task2
                     else
                     {
                         Write(next, "C", true);
-                        countC++;
                         streamReader.Close();
                         return exit;
                     }
@@ -261,37 +248,323 @@ namespace AlgorithmsLaba4.Task2
         }
         public void Sorting(int columNum)
         {
+            string readFileName = "A";
+            string writeFileName = "D";
             columNumSort = columNum;
             do
             {
-                ClearFile("B");
-                ClearFile("C");
-                bool exit = DistributionFiles();
+                bool exit = DistributionFiles(readFileName);
                 if (exit)
                 {
                     ClearFile("B");
+                    if (!readFileName.Equals("A"))
+                    {
+                        StreamReader streamReader = new StreamReader($"..\\..\\..\\..\\TestMerge\\" + readFileName + ".txt");
+                        while (!streamReader.EndOfStream)
+                        {
+                            Write(streamReader.ReadToEnd(), "A", true);
+                        }
+                    }
                     break;// проверка если при распределении по файлам файл C пустой то значит файл A отсортированн
                 }
-                ClearFile("A");
-                StreamReader streamReaderB = new StreamReader($"..\\..\\..\\..\\TestMerge\\B.txt");
-                StreamReader streamReaderC = new StreamReader($"..\\..\\..\\..\\TestMerge\\C.txt");
-                string stringCurrentB = streamReaderB.ReadLine();
-                logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с C");
-                string stringPrevB = null;
-                string stringCurrentC = streamReaderC.ReadLine();
-                logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с B");
-                string stringPrevC = null;
-                string currentC = stringCurrentC.Split('|')[columNumSort - 1];
-                string prevC = null;
-                string currentB = stringCurrentB.Split('|')[columNumSort - 1];
-                string prevB = null;
+                StreamReader streamReaderA = new StreamReader($"..\\..\\..\\..\\TestMerge\\" + readFileName + ".txt");
+                string prev = null;
+                string current = null;
+                string prevString = null;
+                string currentString = null;
+                if (!streamReaderA.EndOfStream)
+                {
+                    currentString = streamReaderA.ReadLine();
+                    logger.Log(Level.INFO, $"Считываем строку {currentString} с {readFileName}");
+                }
                 do
                 {
+                    ClearFile("B");
+                    ClearFile("C");
+                    if (currentString != null)
+                    {
+                        Write(currentString, "B", true);
+                    }
+                    prevString = currentString;
+                    if (!streamReaderA.EndOfStream)
+                    {
+                        currentString = streamReaderA.ReadLine();
+                        logger.Log(Level.INFO, $"Считываем строку {currentString} с {readFileName}");
+                        prev = prevString.Split('|')[columNumSort - 1];
+                        current = currentString.Split('|')[columNumSort - 1];
+                    }
+                    else
+                    {
+                        currentString = null;
+                    }
+                    while (!prev.CompareTo(current).Equals(1))
+                    {
+                        if (currentString != null)
+                        {
+                            Write(currentString, "B", true);
+                        }
+                        prevString = currentString;
+                        prev = current;
+                        if (!streamReaderA.EndOfStream)
+                        {
+                            currentString = streamReaderA.ReadLine();
+                            logger.Log(Level.INFO, $"Считываем строку {currentString} с {readFileName}");
+                            current = currentString.Split('|')[columNumSort - 1];
+                        }
+                        else
+                        {
+                            currentString = null;
+                            break;
+                        }
+                    }
+                    if (currentString != null)
+                    {
+                        Write(currentString, "C", true);
+                    }
+                    prevString = currentString;
+                    prev = current;
+                    if (!streamReaderA.EndOfStream)
+                    {
+                        currentString = streamReaderA.ReadLine();
+                        logger.Log(Level.INFO, $"Считываем строку {currentString} с {readFileName}");
+                        current = currentString.Split('|')[columNumSort - 1];
+                    }
+                    else
+                    {
+                        currentString = null;
+                    }
+                    while (!prev.CompareTo(current).Equals(1))
+                    {
+                        if (currentString != null)
+                        {
+                            Write(currentString, "C", true);
+                        }
+                        prevString = currentString;
+                        prev = current;
+                        if (!streamReaderA.EndOfStream)
+                        {
+                            currentString = streamReaderA.ReadLine();
+                            logger.Log(Level.INFO, $"Считываем строку {currentString} с {readFileName}");
+                            current = currentString.Split('|')[columNumSort - 1];
+                        }
+                        else
+                        {
+                            currentString = null;
+                            break;
+                        }
+                    }
+                    Megring(writeFileName);
+                } while (!streamReaderA.EndOfStream);
+                streamReaderA.Close();
+                ClearFile(readFileName);
+                var temp = readFileName;
+                readFileName = writeFileName;
+                writeFileName = temp;
+            } while (true);
+            //ClearFile("B");
+            //ClearFile("C");
+            //bool exit = DistributionFiles();
+            //if (exit)
+            //{
+            //    ClearFile("B");
+            //    break;// проверка если при распределении по файлам файл C пустой то значит файл A отсортированн
+            //}
+            //ClearFile("A");
+            //StreamReader streamReaderB = new StreamReader($"..\\..\\..\\..\\TestMerge\\B.txt");
+            //StreamReader streamReaderC = new StreamReader($"..\\..\\..\\..\\TestMerge\\C.txt");
+            //string stringCurrentB = streamReaderB.ReadLine();
+            //logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с C");
+            //string stringPrevB = null;
+            //string stringCurrentC = streamReaderC.ReadLine();
+            //logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с B");
+            //string stringPrevC = null;
+            //string currentC = stringCurrentC.Split('|')[columNumSort - 1];
+            //string prevC = null;
+            //string currentB = stringCurrentB.Split('|')[columNumSort - 1];
+            //string prevB = null;
+            //do
+            //{
+            //    if (currentB.CompareTo(currentC).Equals(-1))
+            //    {
+            //        if (stringCurrentB != null)
+            //        {
+            //            Write(stringCurrentB, "A", true);
+            //            stringCurrentB = null;
+            //        }
+            //    }
+            //    else if (currentB.CompareTo(currentC).Equals(0))
+            //    {
+            //        if (stringCurrentB != null)
+            //        {
+            //            Write(stringCurrentB, "A", true);
+            //            stringCurrentB = null;
+            //        }
+            //        if (stringCurrentC != null)
+            //        {
+            //            Write(stringCurrentC, "A", true);
+            //            stringCurrentC = null;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        if (stringCurrentC != null)
+            //        {
+            //            Write(stringCurrentC, "A", true);
+            //            stringCurrentC = null;
+            //        }
+            //    }
+            //    if (stringCurrentB == null)
+            //    {
+            //        if (!streamReaderB.EndOfStream)
+            //        {
+            //            stringPrevB = stringCurrentB;
+            //            prevB = currentB;
+            //            stringCurrentB = streamReaderB.ReadLine();
+            //            currentB = stringCurrentB.Split('|')[columNumSort - 1];
+            //            logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с А");
+            //        }
+            //        else
+            //        {
+            //            break;
+            //        }
+            //    }
+            //    if (stringCurrentC == null)
+            //    {
+            //        if (!streamReaderC.EndOfStream)
+            //        {
+            //            stringPrevC = stringCurrentC;
+            //            prevC = currentC;
+            //            stringCurrentC = streamReaderC.ReadLine();
+            //            currentC = stringCurrentC.Split('|')[columNumSort - 1];
+            //            logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с А");
+            //        }
+            //        else
+            //        {
+            //            break;
+            //        }
+            //    }
+            //    if (prevB != null)
+            //    {
+            //        if (prevB.CompareTo(currentB).Equals(1))
+            //        {
+            //            if (prevC == null)
+            //            {
+            //                prevC = currentC;
+            //            }
+            //            while (!prevC.CompareTo(currentC).Equals(1))
+            //            {
+            //                Write(stringCurrentC, "A", true);
+            //                if (!streamReaderC.EndOfStream)
+            //                {
+            //                    stringPrevC = stringCurrentC;
+            //                    prevC = currentC;
+            //                    stringCurrentC = streamReaderC.ReadLine();
+            //                    currentC = stringCurrentC.Split('|')[columNumSort - 1];
+            //                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с А");
+            //                }
+            //                else
+            //                {
+            //                    stringCurrentC = null;
+            //                    break;
+            //                }
+            //            }
+            //            prevC = null;
+            //            stringPrevC = null;
+            //            continue;
+            //        }
+            //    }
+            //    if (prevC != null)
+            //    {
+            //        if (prevC.CompareTo(currentC).Equals(1))
+            //        {
+            //            if (prevB == null)
+            //            {
+            //                prevB = currentB;
+            //            }
+            //            while (!prevB.CompareTo(currentB).Equals(1))
+            //            {
+            //                Write(stringCurrentB, "A", true);
+            //                if (!streamReaderB.EndOfStream)
+            //                {
+            //                    stringPrevB = stringCurrentB;
+            //                    prevB = currentB;
+            //                    stringCurrentB = streamReaderB.ReadLine();
+            //                    currentB = stringCurrentB.Split('|')[columNumSort - 1];
+            //                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с А");
+            //                }
+            //                else
+            //                {
+            //                    stringCurrentB = null;
+            //                    break;
+            //                }
+            //            }
+            //            prevB = null;
+            //            stringPrevB = null;
+            //        }
+            //    }
+            //} while (true);
+            //while (true)
+            //{
+            //    if (stringCurrentB != null)
+            //    {
+            //        Write(stringCurrentB, "A", true);
+            //        stringCurrentB = null;
+            //    }
+            //    if (!streamReaderB.EndOfStream)
+            //    {
+            //        stringCurrentB = streamReaderB.ReadLine();
+            //        logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с А");
+            //    }
+            //    else
+            //    {
+            //        break;
+            //    }
+            //}
+            //while (true)
+            //{
+            //    if (stringCurrentC != null)
+            //    {
+            //        Write(stringCurrentC, "A", true);
+            //        stringCurrentC = null;
+            //    }
+            //    if (!streamReaderC.EndOfStream)
+            //    {
+            //        stringCurrentC = streamReaderC.ReadLine();
+            //        logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с А");
+            //    }
+            //    else
+            //    {
+            //        break;
+            //    }
+            //}
+            //streamReaderB.Close();
+            //streamReaderC.Close();
+            /*} while (true)*/;
+            logger.Log(Level.INFO, $"Отсортированно");
+            Console.WriteLine("Готово, нажмите Enter чтобы продолжить");
+        }
+        private void Megring(string writeFileName)
+        {
+            StreamReader streamReaderB = new StreamReader($"..\\..\\..\\..\\TestMerge\\B.txt");
+            StreamReader streamReaderC = new StreamReader($"..\\..\\..\\..\\TestMerge\\C.txt");
+            string stringCurrentB = streamReaderB.ReadLine();
+            string currentB = stringCurrentB.Split('|')[columNumSort - 1];
+            logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с B");
+            string stringCurrentC = null;
+            string currentC = null;
+            if (!streamReaderC.EndOfStream)
+            {
+                stringCurrentC = streamReaderC.ReadLine();
+                currentC = stringCurrentC.Split('|')[columNumSort - 1];
+                logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с C");
+                do
+                {
+                    logger.Log(Level.INFO, $"Сравниваем строку {currentB} и {currentC}");
                     if (currentB.CompareTo(currentC).Equals(-1))
                     {
                         if (stringCurrentB != null)
                         {
-                            Write(stringCurrentB, "A", true);
+                            Write(stringCurrentB, writeFileName, true);
                             stringCurrentB = null;
                         }
                     }
@@ -299,12 +572,12 @@ namespace AlgorithmsLaba4.Task2
                     {
                         if (stringCurrentB != null)
                         {
-                            Write(stringCurrentB, "A", true);
+                            Write(stringCurrentB, writeFileName, true);
                             stringCurrentB = null;
                         }
                         if (stringCurrentC != null)
                         {
-                            Write(stringCurrentC, "A", true);
+                            Write(stringCurrentC, writeFileName, true);
                             stringCurrentC = null;
                         }
                     }
@@ -312,7 +585,7 @@ namespace AlgorithmsLaba4.Task2
                     {
                         if (stringCurrentC != null)
                         {
-                            Write(stringCurrentC, "A", true);
+                            Write(stringCurrentC, writeFileName, true);
                             stringCurrentC = null;
                         }
                     }
@@ -320,8 +593,6 @@ namespace AlgorithmsLaba4.Task2
                     {
                         if (!streamReaderB.EndOfStream)
                         {
-                            stringPrevB = stringCurrentB;
-                            prevB = currentB;
                             stringCurrentB = streamReaderB.ReadLine();
                             currentB = stringCurrentB.Split('|')[columNumSort - 1];
                             logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с А");
@@ -335,8 +606,6 @@ namespace AlgorithmsLaba4.Task2
                     {
                         if (!streamReaderC.EndOfStream)
                         {
-                            stringPrevC = stringCurrentC;
-                            prevC = currentC;
                             stringCurrentC = streamReaderC.ReadLine();
                             currentC = stringCurrentC.Split('|')[columNumSort - 1];
                             logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с А");
@@ -346,108 +615,44 @@ namespace AlgorithmsLaba4.Task2
                             break;
                         }
                     }
-                    if (prevB != null)
-                    {
-                        if (prevB.CompareTo(currentB).Equals(1))
-                        {
-                            if (prevC == null)
-                            {
-                                prevC = currentC;
-                            }
-                            while (!prevC.CompareTo(currentC).Equals(1))
-                            {
-                                Write(stringCurrentC, "A", true);
-                                if (!streamReaderC.EndOfStream)
-                                {
-                                    stringPrevC = stringCurrentC;
-                                    prevC = currentC;
-                                    stringCurrentC = streamReaderC.ReadLine();
-                                    currentC = stringCurrentC.Split('|')[columNumSort - 1];
-                                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с А");
-                                }
-                                else
-                                {
-                                    stringCurrentC = null;
-                                    break;
-                                }
-                            }
-                            prevC = null;
-                            stringPrevC = null;
-                            continue;
-                        }
-                    }
-                    if (prevC != null)
-                    {
-                        if (prevC.CompareTo(currentC).Equals(1))
-                        {
-                            if (prevB == null)
-                            {
-                                prevB = currentB;
-                            }
-                            while (!prevB.CompareTo(currentB).Equals(1))
-                            {
-                                Write(stringCurrentB, "A", true);
-                                if (!streamReaderB.EndOfStream)
-                                {
-                                    stringPrevB = stringCurrentB;
-                                    prevB = currentB;
-                                    stringCurrentB = streamReaderB.ReadLine();
-                                    currentB = stringCurrentB.Split('|')[columNumSort - 1];
-                                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с А");
-                                }
-                                else
-                                {
-                                    stringCurrentB = null;
-                                    break;
-                                }
-                            }
-                            prevB = null;
-                            stringPrevB = null;
-                        }
-                    }
                 } while (true);
-                while (true)
+            }
+            while (true)
+            {
+                if (stringCurrentB != null)
                 {
-                    if (stringCurrentB != null)
-                    {
-                        Write(stringCurrentB, "A", true);
-                        stringCurrentB = null;
-                    }
-                    if (!streamReaderB.EndOfStream)
-                    {
-                        stringCurrentB = streamReaderB.ReadLine();
-                        logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с А");
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    Write(stringCurrentB, writeFileName, true);
+                    stringCurrentB = null;
                 }
-                while (true)
+                if (!streamReaderB.EndOfStream)
                 {
-                    if (stringCurrentC != null)
-                    {
-                        Write(stringCurrentC, "A", true);
-                        stringCurrentC = null;
-                    }
-                    if (!streamReaderC.EndOfStream)
-                    {
-                        stringCurrentC = streamReaderC.ReadLine();
-                        logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с А");
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    stringCurrentB = streamReaderB.ReadLine();
+                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentB} с А");
                 }
-                streamReaderB.Close();
-                streamReaderC.Close();
-                positionA = 0;
-                positionB = 0;
-                positionC = 0;
-            } while (true);
-            logger.Log(Level.INFO, $"Отсортированно");
-            Console.WriteLine("Готово, нажмите Enter чтобы продолжить");
+                else
+                {
+                    break;
+                }
+            }
+            while (true)
+            {
+                if (stringCurrentC != null)
+                {
+                    Write(stringCurrentC, writeFileName, true);
+                    stringCurrentC = null;
+                }
+                if (!streamReaderC.EndOfStream)
+                {
+                    stringCurrentC = streamReaderC.ReadLine();
+                    logger.Log(Level.INFO, $"Считываем строку {stringCurrentC} с А");
+                }
+                else
+                {
+                    break;
+                }
+            }
+            streamReaderB.Close();
+            streamReaderC.Close();
         }
         private void ClearFile(string namePath)
         {
@@ -467,55 +672,55 @@ namespace AlgorithmsLaba4.Task2
                 Console.WriteLine(e.Message);
             }
         }
-        private int Read(string namePath, long position = 0)
-        {
-            string path = $"..\\..\\..\\..\\TestMerge\\{namePath}.txt";
-            string result = "";
-            try
-            {
-                using (FileStream sr = new FileStream(path, FileMode.Open))
-                {
-                    byte[] buffer = new byte[1];
-                    sr.Seek(position, SeekOrigin.Current);
-                    string temp = "";
-                    do
-                    {
-                        var a = sr.Read(buffer, 0, 1);
-                        char converToChar = (char)buffer[0];
-                        if (converToChar == '\0')
-                        {
-                            throw new Exception();
-                        }
-                        temp += converToChar;
-                    } while (buffer[0] != 32);
-                    result = temp;
-                    logger.Log(Level.INFO, $"Элемент {result} считался из файла {namePath}");
-                    if (namePath.Equals("A"))
-                    {
-                        positionA = sr.Position;
-                        maxPositionA = sr.Length;
-                    }
-                    else if (namePath.Equals("B"))
-                    {
-                        positionB = sr.Position;
-                        maxPositionB = sr.Length;
-                    }
-                    else if (namePath.Equals("C"))
-                    {
-                        positionC = sr.Position;
-                        maxPositionC = sr.Length;
-                    }
-                    sr.Close();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("The file could not be read:");
-                Console.WriteLine(e.Message);
-                throw new Exception("Неверный формат");
-            }
-            return int.Parse(result);
-        }
+        //private int Read(string namePath, long position = 0)
+        //{
+        //    string path = $"..\\..\\..\\..\\TestMerge\\{namePath}.txt";
+        //    string result = "";
+        //    try
+        //    {
+        //        using (FileStream sr = new FileStream(path, FileMode.Open))
+        //        {
+        //            byte[] buffer = new byte[1];
+        //            sr.Seek(position, SeekOrigin.Current);
+        //            string temp = "";
+        //            do
+        //            {
+        //                var a = sr.Read(buffer, 0, 1);
+        //                char converToChar = (char)buffer[0];
+        //                if (converToChar == '\0')
+        //                {
+        //                    throw new Exception();
+        //                }
+        //                temp += converToChar;
+        //            } while (buffer[0] != 32);
+        //            result = temp;
+        //            logger.Log(Level.INFO, $"Элемент {result} считался из файла {namePath}");
+        //            if (namePath.Equals("A"))
+        //            {
+        //                positionA = sr.Position;
+        //                maxPositionA = sr.Length;
+        //            }
+        //            else if (namePath.Equals("B"))
+        //            {
+        //                positionB = sr.Position;
+        //                maxPositionB = sr.Length;
+        //            }
+        //            else if (namePath.Equals("C"))
+        //            {
+        //                positionC = sr.Position;
+        //                maxPositionC = sr.Length;
+        //            }
+        //            sr.Close();
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("The file could not be read:");
+        //        Console.WriteLine(e.Message);
+        //        throw new Exception("Неверный формат");
+        //    }
+        //    return int.Parse(result);
+        //}
         private void Write(string data, string namePath, bool append)
         {
             string path = $"..\\..\\..\\..\\TestMerge\\{namePath}.txt";
