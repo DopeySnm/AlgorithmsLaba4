@@ -28,7 +28,9 @@ namespace AlgorithmsLaba4.Task2
         {
             logger = new Logger("Прямая сортировка");
             IMessageHandler fileHandler = new FileHandler("DirectMergeLog");
+            IMessageHandler consoleHandler = new ConsoleHandler();
             logger.addMessageHandler(fileHandler);
+            logger.addMessageHandler(consoleHandler);
             logger.SetLevel(Level.INFO);
         }
         private void CountOpSet()
@@ -206,6 +208,7 @@ namespace AlgorithmsLaba4.Task2
             ClearFile("C");
             for (int i = 0; i < countOp.Count; i++)
             {
+                logger.Log(Level.INFO, $"Распределение по файлам");
                 DistributionFiles(sizeTempData);
                 countA = countB + countC;
                 if (temp)
@@ -214,6 +217,7 @@ namespace AlgorithmsLaba4.Task2
                     temp = false;
                 }
                 ClearFile("A");
+                logger.Log(Level.INFO, $"Слияние В и С");
                 Merging(sizeTempData, i);
                 sizeTempData *= 2;
                 positionA = 0;

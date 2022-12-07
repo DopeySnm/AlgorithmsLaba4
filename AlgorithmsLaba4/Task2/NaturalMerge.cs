@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AlgorithmsLaba4.Task2
 {
@@ -21,6 +22,27 @@ namespace AlgorithmsLaba4.Task2
             logger.addMessageHandler(fileHandler);
             logger.addMessageHandler(consoleHandler);
             logger.SetLevel(Level.INFO);
+        }
+        private bool CheckExit(string readFileName)
+        {
+            logger.Log(Level.INFO, $"Проверка выхода");
+            StreamReader streamReader = new StreamReader($"..\\..\\..\\..\\TestMerge\\{readFileName}.txt");
+            string current = streamReader.ReadLine();
+            string prev = null;
+            while (!streamReader.EndOfStream)
+            {
+                prev = current;
+                current = streamReader.ReadLine();
+                var a = prev.Split("|")[columNumSort - 1];
+                var b = current.Split("|")[columNumSort - 1];
+                if (a.CompareTo(b).Equals(1))
+                {
+                    streamReader.Close();
+                    return false;
+                }
+            }
+            streamReader.Close();
+            return true;
         }
         private bool DistributionFiles(string readFileName)
         {
@@ -250,11 +272,11 @@ namespace AlgorithmsLaba4.Task2
         {
             string readFileName = "A";
             string writeFileName = "D";
+            ClearFile(writeFileName);
             columNumSort = columNum;
             do
             {
-                bool exit = DistributionFiles(readFileName);
-                if (exit)
+                if (CheckExit(readFileName))
                 {
                     ClearFile("B");
                     if (!readFileName.Equals("A"))
@@ -264,6 +286,8 @@ namespace AlgorithmsLaba4.Task2
                         {
                             Write(streamReader.ReadToEnd(), "A", true);
                         }
+                        streamReader.Close();
+                        ClearFile(readFileName);
                     }
                     break;// проверка если при распределении по файлам файл C пустой то значит файл A отсортированн
                 }
@@ -353,6 +377,7 @@ namespace AlgorithmsLaba4.Task2
                             break;
                         }
                     }
+                    logger.Log(Level.INFO, $"Сливаем В и С");
                     Megring(writeFileName);
                 } while (!streamReaderA.EndOfStream);
                 streamReaderA.Close();
